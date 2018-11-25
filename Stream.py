@@ -52,7 +52,12 @@ class Stream:
 
     @property
     def T_c(self):
-        return self._T - 273.15
+        if self.x is None:
+            return self._T - 273.15
+        elif 0.0 <= self.x <= 1.0:
+            return PropsSI('T', 'P', self.P, 'Q', self.x, self.fluid) - 273.15
+        else:
+            raise ValueError('Wrong quality number, x should be [0, 1]!')
 
     @T_c.setter
     def T_c(self, T_c):
