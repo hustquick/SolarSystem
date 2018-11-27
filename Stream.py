@@ -1,6 +1,7 @@
 """This class describes a fluid stream that has inherent
     properties and dependent properties"""
 from CoolProp.CoolProp import PropsSI
+from mass_flow_rate import mass_flow_rate
 import Const
 
 
@@ -11,8 +12,7 @@ class Stream:
     Becasue in a power plant, the pressure is the controlled factor for
     mixed fluids.
     """
-
-    def __init__(self, fluid=Const.FLUID[1], dot_m=0):
+    def __init__(self, fluid=Const.FLUID[1], dot_m=mass_flow_rate(0)):
         self._T = None        # Temperature, K
         self._P = None         # Pressure, Pa
         self.fluid = fluid  # Fluid type

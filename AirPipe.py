@@ -1,5 +1,5 @@
 class AirPipe:
-    """irPipe This class is used to describe the air pipe in dish receiver
+    """AirPipe This class is used to describe the air pipe in dish receiver
     """
 
     T = None

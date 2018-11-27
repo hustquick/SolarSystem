@@ -18,11 +18,10 @@ class Turbine:
     _alpha = 0.1        # dependancy factor of stages. P13 of "Simulation of
     # the part-load behavior of a 30 MWe SEGES plant"
 
-    def __init__(self, st_i=Stream, st_o_1=Stream, st_o_2=None,
-                 y=None, power=_power_d):
-        self.st_i = st_i
-        self.st_o_1 = st_o_1
-        self.st_o_2 = st_o_2
+    def __init__(self, y=0, power=_power_d):
+        self.st_i = Stream()
+        self.st_o_1 = Stream()
+        self.st_o_2 = Stream()
         self.y = y
         self._power = power
 
@@ -77,17 +76,16 @@ class Turbine:
 
 if __name__ == '__main__':
     tb = Turbine()
-    tb.st_i = Stream()
+
     tb.st_i.fluid = tb._fluid_d
     tb.st_i.P = tb._P_s_d
     tb.st_i.T = tb._T_s_d
-    tb.st_o_2 = Stream()
+
     tb.st_o_2.fluid = tb._fluid_d
     tb.st_o_2.P = tb._P_c_d
     P1 = tb.st_i.P
     P2 = 20000
     st2 = tb.get_st2(tb.st_i, P2)
-
 
 
 #    properties(Dependent)
