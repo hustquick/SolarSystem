@@ -131,7 +131,7 @@ class DishCollector:
 
     def q_cond_rad(self):
         return self.insLayer.epsilon * self.A_ins * \
-                Const.SIGMA() * (self.insLayer.T ** 4 - self.amb.T ** 4)
+                Const.SIGMA * (self.insLayer.T ** 4 - self.amb.T ** 4)
 
     def q_cond_tot(self):
         # Heat loss from air pipe to the insulating layer, W
@@ -150,7 +150,7 @@ class DishCollector:
         mu = PropsSI('V', 'T', T, 'P', self.amb.P, self.amb.fluid)
         density = PropsSI('D', 'T', T, 'P', self.amb.P, self.amb.fluid)
         nu = mu / density
-        Gr = Const.G() * beta * (self.airPipe.T - self.amb.T) * \
+        Gr = Const.G * beta * (self.airPipe.T - self.amb.T) * \
             self.d_bar_cav ** 3 / nu ** 2
 
         Nu = Const.Nu_nat_conv(Gr, self.airPipe.T, self.amb.T, self.theta,
@@ -168,7 +168,7 @@ class DishCollector:
             (self.airPipe.alpha + (1 - self.airPipe.alpha) *
              (A_ap / self.A_cav))
         epsilon_cav = alpha_eff
-        return epsilon_cav * A_ap * Const.SIGMA() * \
+        return epsilon_cav * A_ap * Const.SIGMA * \
             (self.airPipe.T ** 4 - self.amb.T ** 4)
 
     def CalcDishCollector1(self, x):
@@ -261,7 +261,7 @@ class DishCollector:
         # Assume no pressure loss
         self.st_o.P = self.st_i.P
         self.st_o.P = self.st_i.P
-        guess = np.array([1500, 200, 19])
+        guess = np.array([500, 300, 19])
         # options = optimset('Display','iter')
         x = fsolve(self.CalcDishCollector3, guess)
         self.A = x[2]

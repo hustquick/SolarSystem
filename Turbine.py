@@ -1,3 +1,7 @@
+"""This class define steam turbine
+      The steam turbine is a product, N-6 2.35, of Qingdao Jieneng Power
+      Station Engineering Co., Ltd
+    """
 from mass_flow_rate import mass_flow_rate
 from Stream import Stream
 from CoolProp.CoolProp import PropsSI
@@ -5,10 +9,6 @@ import Const
 
 
 class Turbine:
-    """This class define steam turbine
-      The steam turbine is a product, N-6 2.35, of Qingdao Jieneng Power
-      Station Engineering Co., Ltd
-    """
     _fluid_d = Const.FLUID[1]   # Designed working fluid
     _T_s_d = 663.15     # Designed main steam temperature, K
     _P_s_d = 2.35e6     # Designed main steam pressure, Pa
@@ -37,7 +37,7 @@ class Turbine:
         self._power = energy_in - energy_out
 
     @power.setter
-    def set_power(self, power):
+    def power(self, power):
         self._power = power
 
     @property
@@ -87,84 +87,3 @@ if __name__ == '__main__':
     P2 = 20000
     st2 = tb.get_st2(tb.st_i, P2)
 
-
-#    properties(Dependent)
-#        P;      % Power of steam turbine, W
-#        eta_i;    % Efficiency of the turbine
-#    end
-#
-#    methods
-#        function obj = Turbine
-#            obj.st_i = Stream;
-#            obj.st_o_1 = Stream;
-#            obj.st_o_2 = Stream;
-#        end
-#    end
-#    methods
-#        function flowInTurbine(obj, st1, st2, p)
-#            st2.fluid = st1.fluid;
-#            st2.q_m = st1.q_m;
-#            st2.p = p;
-#            h2_i = CoolProp.PropsSI('H', 'P', st2.p.v, 'S', st1.s, st2.fluid);
-#            h2 = st1.h - obj.eta_i .* (st1.h - h2_i);
-#            h2_l = CoolProp.PropsSI('H', 'P', st2.p.v, 'Q', 0, st2.fluid);
-#            h2_g = CoolProp.PropsSI('H', 'P', st2.p.v, 'Q', 1, st2.fluid);
-#            if (h2 >= h2_l && h2 <= h2_g)
-#%                 st2.x = (h2 - h2_l) ./ (h2_g - h2_l);
-#                st2.x = CoolProp.PropsSI('Q', 'P', st2.p.v, ...
-#                    'H', h2, st2.fluid);
-#                st2.T = CoolProp.PropsSI('T', 'P', st2.p.v, ...
-#                    'Q', st2.x, st2.fluid);
-#            else
-#                st2.T = CoolProp.PropsSI('T', 'P', st2.p.v,'H', ...
-#                    h2, st2.fluid);
-#            end
-#        end
-#        function work(obj, ge)
-#            st_tmp1 = Stream;
-#            st_tmp2 = Stream;
-#            obj.flowInTurbine(obj.st_i, st_tmp1, obj.st_o_1.p);
-#            obj.flowInTurbine(st_tmp1, st_tmp2, obj.st_o_2.p);
-#            P = ge.P ./ ge.eta;
-#            y1 = (P - obj.st_i.q_m.v .* (obj.st_i.h - st_tmp2.h)) ...
-#                / (obj.st_i.q_m.v .* (st_tmp2.h - st_tmp1.h));
-#            if (y1 >= 0 && y1 <= 1)
-#                obj.y = y1;
-#                st_tmp1.convergeTo(obj.st_o_1, obj.y);
-#                st_tmp2.convergeTo(obj.st_o_2,1 - obj.y);
-#            else
-#                error('wrong y value of turbine');
-#%                 obj.y = 1;
-#%                 st_tmp1.convergeTo(obj.st_o_1, obj.y);
-#%                 st_tmp2.convergeTo(obj.st_o_2,1 - obj.y);
-#            end
-#        end
-#        function value = get_q_m(obj, ge)
-#            P = ge.P ./ ge.eta;
-#            st_tmp1 = Stream;
-#            st_tmp2 = Stream;
-#            obj.flowInTurbine(obj.st_i, st_tmp1, obj.st_o_1.p);
-#            obj.flowInTurbine(st_tmp1, st_tmp2, obj.st_o_2.p);
-#
-#            delta_h = obj.st_i.h - obj.y .* ...
-#                st_tmp1.h - (1 - obj.y) .* st_tmp2.h;
-#            value = P / delta_h;
-#        end
-#
-#        function value = get.eta_i(obj)
-#            h_1_d = CoolProp.PropsSI('H', 'T', obj.T_s_d, 'P', ...
-#                obj.p_s_d, obj.fluid_d);
-#            s_1_d = CoolProp.PropsSI('S', 'T', obj.T_s_d, 'P', ...
-#                obj.p_s_d, obj.fluid_d);
-#            h_2_d = h_1_d - obj.P_d / obj.q_m_d.v;
-#            h_2_i_d = CoolProp.PropsSI('H', 'S', s_1_d, 'P', ...
-#                obj.p_c_d, obj.fluid_d);
-#            value = (h_1_d - h_2_d) / (h_1_d - h_2_i_d);
-#        end
-#        function value = get.P(obj)
-#            value = obj.st_i.q_m.v .* ((1-obj.y) .* ...
-#                (obj.st_i.h - obj.st_o_2.h) + ...
-#                obj.y .* (obj.st_i.h - obj.st_o_1.h));
-#        end
-#    end
-#end

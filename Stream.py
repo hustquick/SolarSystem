@@ -6,12 +6,6 @@ import Const
 
 
 class Stream:
-    """This class describes a fluid stream that has inherent
-    properties and dependent properties
-    ATTENTION: If given T and P, set x will lead to change T, NOT P!
-    Becasue in a power plant, the pressure is the controlled factor for
-    mixed fluids.
-    """
     def __init__(self, fluid=Const.FLUID[1], dot_m=mass_flow_rate(0)):
         self._T = None        # Temperature, K
         self._P = None         # Pressure, Pa
@@ -28,7 +22,8 @@ class Stream:
                 or (self.x >= 1) or (self._P is None):
             return self._T
         else:
-            return PropsSI('T', 'Q', self.x, 'P', self._P, self.fluid)
+            self._T = PropsSI('T', 'Q', self.x, 'P', self._P, self.fluid)
+            return self._T
 
     @T.setter
     def T(self, T):
@@ -40,15 +35,6 @@ class Stream:
         else:
             raise ValueError("Pressure and quality are already given,"
                              " please check!")
-
-    @T.getter
-    def get_T(self, h, P):
-        if self.x is None:
-            self._T = PropsSI('T', 'H', self.h, 'P', self.P, self.fluid)
-        elif 0.0 <= self.x <= 1.0:
-            self._T = PropsSI('T', 'Q', self.x, 'P', self.P, self.fluid)
-        else:
-            raise ValueError('Wrong quality number, x should be [0, 1]!')
 
     @property
     def T_c(self):
@@ -71,7 +57,8 @@ class Stream:
                 or (self.x >= 1) or (self._T is None):
             return self._P
         else:
-            return PropsSI('P', 'Q', self.x, 'T', self.T, self.fluid)
+            self._P = PropsSI('P', 'Q', self.x, 'T', self.T, self.fluid)
+            return self._P
 
     @P.setter
     def P(self, P):
@@ -83,15 +70,6 @@ class Stream:
         else:
             raise ValueError("Temperature and quality are already given,"
                              " please check!")
-
-    @P.getter
-    def get_P(self, h, P):
-        if self.x is None:
-            self._P = PropsSI('P', 'H', self.h, 'T', self._T, self.fluid)
-        elif 0.0 <= self.x <= 1.0:
-            self._P = PropsSI('P', 'Q', self.x, 'T', self._T, self.fluid)
-        else:
-            raise ValueError('Wrong quality number, x should be [0, 1]!')
 
     @property
     def h(self):
@@ -129,9 +107,9 @@ class Stream:
         if self.fluid == st1.fluid and self.P == st1.P:
             st2.fluid = self.fluid
             st2.P = self.P
-            st2.dot_m = self.dot_m + st1.dot_m
-            h = (self.dot_m * self.h + st1.dot_m * st1.h) / \
-                (self.dot_m + st1.dot_m)
+            st2.dot_m = self.dot_m.v + st1.dot_m.v
+            h = (self.dot_m.v * self.h + st1.dot_m.v * st1.h) / \
+                (self.dot_m.v + st1.dot_m.v)
             st2.T = PropsSI('T', 'H', h, 'P', st2.P)
             return st2
         raise ValueError('Fluid types and pressures of the fluids'
