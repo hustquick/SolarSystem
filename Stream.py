@@ -1,102 +1,104 @@
 """This class describes a fluid stream that has inherent
-    properties and dependent properties"""
+    properties and dependent properties
+    For a stream, properties of fluid, T, P, x can be set. Properties of h, s, cp
+    are dependent and can not be set.
+    T, P, x are interrelated.
+    """
 from CoolProp.CoolProp import PropsSI
 from mass_flow_rate import mass_flow_rate
 import Const
 
 
 class Stream:
-    def __init__(self, fluid=Const.FLUID[1], dot_m=mass_flow_rate(0)):
-        self._T = None        # Temperature, K
-        self._P = None         # Pressure, Pa
-        self.fluid = fluid  # Fluid type
+    def __init__(self, fluid=Const.FLUID[1], dot_m=mass_flow_rate(0), P_dependent=True):
+        self.fluid = fluid      # Fluid type
         self.dot_m = dot_m      # Mass flow rate, kg/s
-        self.x = None
-        """Quality, [0, 1] for two phase stream; NaN for single
-        phase stream
+        self._T = None          # Temperature, K
+        self._P = None          # Pressure, Pa
+        self._x = None
+        """Quality, [0, 1] for two phase stream; None for single
+           phase stream
         """
+        self.P_dependent = P_dependent  # This is a flag to identify whether it is P-dependent or T-dependent
+
 
     @property
     def T(self):
-        if (self.x is None) or (self.x <= 0) \
-                or (self.x >= 1) or (self._P is None):
-            return self._T
-        else:
-            self._T = PropsSI('T', 'Q', self.x, 'P', self._P, self.fluid)
-            return self._T
+        if self.P_dependent:
+            if (self.x is not None) and (self._P is not None):
+                self._T = PropsSI('T', 'Q', self.x, 'P', self._P, self.fluid)
+        return self._T
 
     @T.setter
     def T(self, T):
         if T < 0:
             raise ValueError("Temperature should be higher than 0 K!")
-        if (self.x is None) or (self.x <= 0) \
-                or (self.x >= 1) or (self._P is None):
-            self._T = float(T)
-        else:
-            raise ValueError("Pressure and quality are already given,"
-                             " please check!")
+        if self.P_dependent:
+            if (self.x is not None) and (self._P is not None):
+                raise ValueError("The stream is set to be P-dependent.\n"
+                                 "Pressure and quality are already given, "
+                                 "please check!")
+        self._T = float(T)
 
     @property
     def T_c(self):
-        if self.x is None:
-            return self._T - 273.15
-        elif 0.0 <= self.x <= 1.0:
-            return PropsSI('T', 'P', self.P, 'Q', self.x, self.fluid) - 273.15
-        else:
-            raise ValueError('Wrong quality number, x should be [0, 1]!')
+        return self._T - 273.15
 
     @T_c.setter
     def T_c(self, T_c):
         if T_c < -273.15:
             raise ValueError("Temperature should be higher than -273.15°C")
+        if self.P_dependent:
+            if (self.x is not None) and (self._P is not None):
+                raise ValueError("The stream is set to be P-dependent.\n"
+                                 "Pressure and quality are already given, "
+                                 "please check!")
         self._T = T_c + 273.15
 
     @property
     def P(self):
-        if (self.x is None) or (self.x <= 0) \
-                or (self.x >= 1) or (self._T is None):
-            return self._P
-        else:
-            self._P = PropsSI('P', 'Q', self.x, 'T', self.T, self.fluid)
-            return self._P
+        if not self.P_dependent:
+            if (self.x is not None) and (self._T is not None):
+                self._P = PropsSI('P', 'Q', self.x, 'T', self.T, self.fluid)
+        return self._P
 
     @P.setter
     def P(self, P):
         if P < 0:
-            raise ValueError("Absolute pressure should be higher than 0 K!")
-        if (self.x is None) or (self.x <= 0) \
-                or (self.x >= 1) or (self.T is None):
-            self._P = float(P)
+            raise ValueError("Absolute pressure should be higher than 0 Pa!")
+        if not self.P_dependent:
+            if (self.x is not None) and (self._T is not None):
+                raise ValueError("The stream is set to be T-dependent.\n"
+                                 "Temperature and quality are already given, "
+                                 "please check!")
+        self._P = float(P)
+
+    @property
+    def x(self):
+        return self._x
+
+    @x.setter
+    def x(self, x):
+        if x is None:
+            self._x = None
+        elif 0 <= x <= 1:
+            self._x = float(x)
         else:
-            raise ValueError("Temperature and quality are already given,"
-                             " please check!")
+            raise ValueError("Wrong x value!\nx should be a number between 0 and 1.")
 
     @property
     def h(self):
-        if self.x is None:
-            return PropsSI('H', 'T', self.T, 'P', self.P, self.fluid)
-        elif 0.0 <= self.x <= 1.0:
-            return PropsSI('H', 'P', self.P, 'Q', self.x, self.fluid)
-        else:
-            raise ValueError('Wrong quality number, x should be [0, 1]!')
+        return PropsSI('H', 'T', self.T, 'P', self.P, self.fluid) if (self.x is None) else \
+               PropsSI('H', 'P', self.P, 'Q', self.x, self.fluid)
 
     @property
     def s(self):
-        if self.x is None:
-            return PropsSI('S', 'T', self._T, 'P', self.P, self.fluid)
-        elif 0.0 <= self.x <= 1.0:
-            return PropsSI('S', 'P', self.P, 'Q', self.x, self.fluid)
-        else:
-            raise ValueError('Wrong quality number, x should be [0, 1]!')
+        return PropsSI('S', 'T', self._T, 'P', self.P, self.fluid) if (self.x is None) else \
+               PropsSI('S', 'P', self.P, 'Q', self.x, self.fluid)
 
     @property
     def cp(self):
-        if self.x is None:
-            return PropsSI('C', 'T', self._T, 'P', self.P, self.fluid)
-        elif 0.0 <= self.x <= 1.0:
-            return float("inf")
-        else:
-            raise ValueError('Wrong quality number, x should be [0, 1]!')
+        return PropsSI('C', 'T', self._T, 'P', self.P, self.fluid) if (self.x is None) else float("inf")
 
     def flow_to(self, st):
         st.fluid = self.fluid
@@ -119,7 +121,15 @@ class Stream:
 if __name__ == '__main__':
     st = Stream()
     st.T = 300
+    st.x = 0
+    # st.P_dependent = False
     st.P = 2e6
-    st.x = 0.1
+
+    st.P_dependent = False
+    st.T_c = 100
+    # Strange thing happened here. While debugging, it is found that st.P equals to 101418 here.
+    st.x = None
+    # when step over here, st.P is still 101418.
+    # But! When set the breakpoint here, st.P will be 2e6.
     print(st.T)
     print(st.P)

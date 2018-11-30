@@ -1,3 +1,6 @@
+"""DishCollector is a kind of Collector which uses dish mirror as the reflector
+and uses volumetric receiver
+"""
 import math
 from Stream import Stream
 from AirPipe import AirPipe
@@ -10,10 +13,6 @@ import numpy as np
 
 
 class DishCollector:
-    """DishCollector is a kind of Collector which uses dish mirror as the reflector
-    and uses volumetric receiver
-    """
-
     gamma = 1       # Intercept factor of the collector
     rho = 0.8         # Reflectance of the collector
     shading = 1     # Shading factor of the collector
@@ -280,5 +279,5 @@ if __name__ == '__main__':
     st_o.T = Const.convtemp(239.26, 'C', 'K')
     st_o.P = 4e5
     dc.st_o = st_o
-    dc.amb.I = 400
+    dc.amb.I = 700
     dc.get_A()
