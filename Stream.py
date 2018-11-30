@@ -24,9 +24,6 @@ class Stream:
 
     @property
     def T(self):
-        if self.P_dependent:
-            if (self.x is not None) and (self._P is not None):
-                self._T = PropsSI('T', 'Q', self.x, 'P', self._P, self.fluid)
         return self._T
 
     @T.setter
@@ -34,10 +31,15 @@ class Stream:
         if T < 0:
             raise ValueError("Temperature should be higher than 0 K!")
         if self.P_dependent:
-            if (self.x is not None) and (self._P is not None):
+            if (self._P is None) and (self._x is not None):
+                self._P = PropsSI('P', 'Q', self._x, 'T', float(T), self.fluid)
+            if (self._P is not None) and (self._x is not None):
                 raise ValueError("The stream is set to be P-dependent.\n"
-                                 "Pressure and quality are already given, "
+                                 "Pressure and quality are already set, "
                                  "please check!")
+        else:
+            if self._x is not None:
+                self._P = PropsSI('P', 'Q', self._x, 'T', float(T), self.fluid)
         self._T = float(T)
 
     @property
@@ -49,27 +51,34 @@ class Stream:
         if T_c < -273.15:
             raise ValueError("Temperature should be higher than -273.15°C")
         if self.P_dependent:
-            if (self.x is not None) and (self._P is not None):
+            if (self._P is None) and (self._x is not None):
+                self._P = PropsSI('P', 'Q', self._x, 'T', float(T_c)+273.15, self.fluid)
+            if (self._P is not None) and (self._x is not None):
                 raise ValueError("The stream is set to be P-dependent.\n"
-                                 "Pressure and quality are already given, "
+                                 "Pressure and quality are already set, "
                                  "please check!")
-        self._T = T_c + 273.15
+        else:
+            if self._x is not None:
+                self._P = PropsSI('P', 'Q', self._x, 'T', float(T_c)+273.15, self.fluid)
+        self._T = float(T_c) + 273.15
 
     @property
     def P(self):
-        if not self.P_dependent:
-            if (self.x is not None) and (self._T is not None):
-                self._P = PropsSI('P', 'Q', self.x, 'T', self.T, self.fluid)
         return self._P
 
     @P.setter
     def P(self, P):
         if P < 0:
             raise ValueError("Absolute pressure should be higher than 0 Pa!")
-        if not self.P_dependent:
-            if (self.x is not None) and (self._T is not None):
+        if self.P_dependent:
+            if self._x is not None:
+                self._T = PropsSI('T', 'Q', self._x, 'P', float(P), self.fluid)
+        else:
+            if (self._T is None) and (self._x is not None):
+                self._T = PropsSI('T', 'Q', self._x, 'P', float(P), self.fluid)
+            if (self._T is not None) and (self._x is not None):
                 raise ValueError("The stream is set to be T-dependent.\n"
-                                 "Temperature and quality are already given, "
+                                 "Temperature and quality are already set, "
                                  "please check!")
         self._P = float(P)
 
@@ -83,6 +92,16 @@ class Stream:
             self._x = None
         elif 0 <= x <= 1:
             self._x = float(x)
+            if self.P_dependent:
+                if self._P is not None:
+                    self._T = PropsSI('T', 'Q', self._x, 'P', self._P, self.fluid)
+                if (self._P is None) and (self._T is not None):
+                    self._P = PropsSI('P', 'Q', self.x, 'T', self.T, self.fluid)
+            else:
+                if self._T is not None:
+                    self._P = PropsSI('P', 'Q', self.x, 'T', self.T, self.fluid)
+                if (self._T is None) and (self._P is not None):
+                    self._T = PropsSI('T', 'Q', self._x, 'P', self._P, self.fluid)
         else:
             raise ValueError("Wrong x value!\nx should be a number between 0 and 1.")
 
@@ -120,16 +139,15 @@ class Stream:
 
 if __name__ == '__main__':
     st = Stream()
-    st.T = 300
-    st.x = 0
-    # st.P_dependent = False
-    st.P = 2e6
-
+    st.dot_m = 1
     st.P_dependent = False
-    st.T_c = 100
-    # Strange thing happened here. While debugging, it is found that st.P equals to 101418 here.
-    st.x = None
-    # when step over here, st.P is still 101418.
-    # But! When set the breakpoint here, st.P will be 2e6.
+    st.P = 1e5
+    # st.T_c = 200
+    st.x = 0.1
+    st.T = 400
+    # st.x = None
     print(st.T)
     print(st.P)
+    print(st.h)
+    print(st.s)
+    print(st.cp)
