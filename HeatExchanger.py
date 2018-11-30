@@ -26,8 +26,8 @@ class HeatExchanger:
         st1_i.fluid = self.st1_o.fluid
         st1_i.dot_m = self.st1_o.dot_m
         st1_i.P = self.st1_o.P + self.pressure_drop(self.st1_o, self.st1_pip)
-        h = self.st1_o.h + (self.st2_i.h - self.st2_o.h) * self.st2_i.dot_m.v \
-            / self.st1_o.dot_m.v / self.eta
+        h = self.st1_o.h + (self.st2_i.h - self.st2_o.h) * self.st2_i.dot_m[0] \
+            / self.st1_o.dot_m[0] / self.eta
         h_l = PropsSI('H', 'P', st1_i.P, 'Q', 0, st1_i.fluid)
         h_g = PropsSI('H', 'P', st1_i.P, 'Q', 1, st1_i.fluid)
         if h_l <= h <= h_g:
@@ -43,8 +43,8 @@ class HeatExchanger:
         st1_o.fluid = self.st1_i.fluid
         st1_o.dot_m = self.st1_i.dot_m
         st1_o.P = self.st1_i.P - self.pressure_drop(self.st1_i, self.st1_pip)
-        h = self.st1_i.h - (self.st2_i.h - self.st2_o.h) * self.st2_i.dot_m.v \
-            / st1_o.dot_m.v / self.eta
+        h = self.st1_i.h - (self.st2_i.h - self.st2_o.h) * self.st2_i.dot_m[0] \
+            / st1_o.dot_m[0] / self.eta
         h_l = PropsSI('H', 'P', st1_o.P, 'Q', 0, st1_o.fluid)
         h_g = PropsSI('H', 'P', st1_o.P, 'Q', 1, st1_o.fluid)
         if h_l <= h <= h_g:
@@ -60,8 +60,8 @@ class HeatExchanger:
         st2_i.fluid = self.st2_o.fluid
         st2_i.dot_m = self.st2_o.dot_m
         st2_i.P = self.st2_o.P + self.pressure_drop(self.st2_o, self.st2_pip)
-        h = self.st2_o.h + (self.st1_i.h - self.st1_o.h) * self.st1_i.dot_m.v \
-            / self.st2_o.dot_m.v * self.eta
+        h = self.st2_o.h + (self.st1_i.h - self.st1_o.h) * self.st1_i.dot_m[0] \
+            / self.st2_o.dot_m[0] * self.eta
         h_l = PropsSI('H', 'P', st2_i.P, 'Q', 0, st2_i.fluid)
         h_g = PropsSI('H', 'P', st2_i.P, 'Q', 1, st2_i.fluid)
         if h_l <= h <= h_g:
@@ -77,8 +77,8 @@ class HeatExchanger:
         st2_o.fluid = self.st2_i.fluid
         st2_o.dot_m = self.st2_i.dot_m
         st2_o.P = self.st2_i.P - self.pressure_drop(self.st2_i, self.st2_pip)
-        h = self.st2_i.h - (self.st1_i.h - self.st1_o.h) * self.st1_i.dot_m.v \
-            / st2_o.dot_m.v / self.eta
+        h = self.st2_i.h - (self.st1_i.h - self.st1_o.h) * self.st1_i.dot_m[0] \
+            / st2_o.dot_m[0] / self.eta
         h_l = PropsSI('H', 'P', st2_o.P, 'Q', 0, st2_o.fluid)
         h_g = PropsSI('H', 'P', st2_o.P, 'Q', 1, st2_o.fluid)
         if h_l <= h <= h_g:
@@ -219,17 +219,17 @@ if __name__ == '__main__':
     he.st1_o.fluid = 'water'
     he.st1_o.T = 700
     he.st1_o.P = 1e5
-    he.st1_o.dot_m.v = 1
+    he.st1_o.dot_m[0] = 1
 
     he.st2_i.fluid = Const.FLUID[1]
     he.st2_i.T = 500
     he.st2_i.P = 1e5
-    he.st2_i.dot_m.v = 1
+    he.st2_i.dot_m[0] = 2
 
     he.st2_o.fluid = he.st2_i.fluid
     he.st2_o.T = 400
     he.st2_o.P = 1e5
-    he.st2_o.dot_m.v = 1
+    he.st2_o.dot_m[0] = 3
 
     he.calc_st1_i()
     he.calc_st1_o()

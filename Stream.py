@@ -5,14 +5,13 @@
     T, P, x are interrelated.
     """
 from CoolProp.CoolProp import PropsSI
-from mass_flow_rate import mass_flow_rate
 import Const
 
 
 class Stream:
-    def __init__(self, fluid=Const.FLUID[1], dot_m=mass_flow_rate(0), P_dependent=True):
+    def __init__(self, fluid=Const.FLUID[1], dot_m=0, P_dependent=True):
         self.fluid = fluid      # Fluid type
-        self.dot_m = dot_m      # Mass flow rate, kg/s
+        self.dot_m = [dot_m]      # Mass flow rate, kg/s
         self._T = None          # Temperature, K
         self._P = None          # Pressure, Pa
         self._x = None
@@ -128,9 +127,9 @@ class Stream:
         if self.fluid == st1.fluid and self.P == st1.P:
             st2.fluid = self.fluid
             st2.P = self.P
-            st2.dot_m = self.dot_m.v + st1.dot_m.v
-            h = (self.dot_m.v * self.h + st1.dot_m.v * st1.h) / \
-                (self.dot_m.v + st1.dot_m.v)
+            st2.dot_m[0] = self.dot_m[0] + st1.dot_m[0]
+            h = (self.dot_m[0] * self.h + st1.dot_m[0] * st1.h) / \
+                (self.dot_m[0] + st1.dot_m[0])
             st2.T = PropsSI('T', 'H', h, 'P', st2.P)
             return st2
         raise ValueError('Fluid types and pressures of the fluids'
@@ -139,7 +138,7 @@ class Stream:
 
 if __name__ == '__main__':
     st = Stream()
-    st.dot_m = 1
+    st.dot_m = [2]
     st.P_dependent = False
     st.P = 1e5
     # st.T_c = 200

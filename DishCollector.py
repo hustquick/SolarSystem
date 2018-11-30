@@ -32,7 +32,7 @@ class DishCollector:
 
     @property
     def q_use(self):
-        return self.st_i.dot_m.v * (self.st_o.h - self.st_i.h)
+        return self.st_i.dot_m[0] * (self.st_o.h - self.st_i.h)
 
     @property
     def q_tot(self):
@@ -67,14 +67,14 @@ class DishCollector:
                       'P', self.st_o.P, self.st_o.fluid)
         h_i = PropsSI('H', 'T', self.st_i.T,
                       'P', self.st_i.P, self.st_i.fluid)
-        return self.st_i.dot_m.v * (h_o - h_i)
+        return self.st_i.dot_m[0] * (h_o - h_i)
 
     def q_dr_1_2(self):
         #  Heat transferred from the air pipe to the air, W
         T = (self.st_i.T + self.st_o.T)/2
         p = (self.st_i.P + self.st_o.P)/2
         density = PropsSI('D', 'T', T, 'P', p, self.st_i.fluid)
-        v = 4 * self.st_i.dot_m.v / (math.pi * self.airPipe.d_i ** 2 * density)
+        v = 4 * self.st_i.dot_m[0] / (math.pi * self.airPipe.d_i ** 2 * density)
         mu = PropsSI('V', 'T', T, 'P', p, self.st_i.fluid)
         Re = density * v * self.airPipe.d_i / mu
         Cp = PropsSI('C', 'T', T, 'P', p, self.st_i.fluid)
@@ -179,7 +179,7 @@ class DishCollector:
         #   q_conv_tot + q_rad_emit
         self.airPipe.T = x[0]
         self.insLayer.T = x[1]
-        self.st_i.dot_m.v = x[2]
+        self.st_i.dot_m[0] = x[2]
         # F = cell(3,1)
         # F{1} = dc.q_dr_1_1 - dc.q_dr_1_2
         # F{2} = dc.q_cond_tot - dc.q_cond_conv - dc.q_cond_rad
@@ -194,6 +194,7 @@ class DishCollector:
     def get_dot_m(self):
         # Known inlet and outlet temperature to calculate the flow rate
         self.st_o.fluid = self.st_i.fluid
+        self.st_o.dot_m = self.st_i.dot_m
         # Assume no pressure loss
         self.st_o.P = self.st_i.P
         self.st_o.P = self.st_i.P
@@ -226,6 +227,7 @@ class DishCollector:
         # Known inlet temperature and flow rate to calculate outlet
         # temperature
         self.st_o.fluid = self.st_i.fluid
+        self.st_o.dot_m = self.st_i.dot_m
         # Assume no pressure loss
         self.st_o.P = self.st_i.P
         self.st_o.P = self.st_i.P
@@ -257,6 +259,7 @@ class DishCollector:
 
     def get_A(self):
         self.st_o.fluid = self.st_i.fluid
+        self.st_o.dot_m = self.st_i.dot_m
         # Assume no pressure loss
         self.st_o.P = self.st_i.P
         self.st_o.P = self.st_i.P
@@ -272,7 +275,7 @@ if __name__ == '__main__':
     st_i.fluid = Const.FLUID[2]
     st_i.T = Const.convtemp(150, 'C', 'K')
     st_i.P = 4e5
-    st_i.dot_m.v = 0.07
+    # st_i.dot_m[0] = 0.07
     dc.st_i = st_i
     st_o = Stream()
     st_o.fluid = Const.FLUID[2]
@@ -280,4 +283,4 @@ if __name__ == '__main__':
     st_o.P = 4e5
     dc.st_o = st_o
     dc.amb.I = 700
-    dc.get_A()
+    dc.get_dot_m()

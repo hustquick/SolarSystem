@@ -2,7 +2,6 @@
       The steam turbine is a product, N-6 2.35, of Qingdao Jieneng Power
       Station Engineering Co., Ltd
     """
-from mass_flow_rate import mass_flow_rate
 from Stream import Stream
 from CoolProp.CoolProp import PropsSI
 import Const
@@ -13,7 +12,7 @@ class Turbine:
     _T_s_d = 663.15     # Designed main steam temperature, K
     _P_s_d = 2.35e6     # Designed main steam pressure, Pa
     _P_c_d = 1.5e4      # Designed exhaust pressure
-    _dot_m_d = mass_flow_rate(32.09/3.6)    # Designed mass flow rate
+    _dot_m_d = [32.09/3.6]    # Designed mass flow rate, kg/s
     _power_d = 6e6      # Designed power
     _alpha = 0.1        # dependancy factor of stages. P13 of "Simulation of
     # the part-load behavior of a 30 MWe SEGES plant"
@@ -42,7 +41,7 @@ class Turbine:
 
     @property
     def eta_i(self):
-        enthalpy_drop = self._power_d / self._dot_m_d.v
+        enthalpy_drop = self._power_d / self._dot_m_d[0]
         h_i = PropsSI('H', 'T', self._T_s_d, 'P', self._P_s_d, self._fluid_d)
 #        h_c = h_i - enthalpy_drop
         s_ideal = PropsSI('S', 'T', self._T_s_d, 'P', self._P_s_d,
