@@ -1,7 +1,6 @@
 """DishCollector is a kind of Collector which uses dish mirror as the reflector
 and uses volumetric receiver
 """
-import math
 from Stream import Stream
 from AirPipe import AirPipe
 from InsLayer import InsLayer
@@ -19,7 +18,7 @@ class DishCollector:
     d_ap = 0.25       # Aperture diameter of the dish receiver, m
     d_cav = 0.45       # Diameter of the cavity of the dish receiver, m
     dep_cav = 0.38     # Depth of the cavity of the dish receiver, m
-    theta = math.radians(45)   # Dish aperture angle(0 is horizontal,
+    theta = np.deg2rad(45)   # Dish aperture angle(0 is horizontal,
     # 90 is vertically down), rad
     A = 23.28         # Aperture area of the collector, m^2
 
@@ -49,13 +48,13 @@ class DishCollector:
     @property
     def A_ins(self):
         d_o = self.insLayer.d_i + 2 * self.insLayer.delta
-        return math.pi * d_o * (self.dep_cav + self.insLayer.delta)
+        return np.pi * d_o * (self.dep_cav + self.insLayer.delta)
 
     @property
     def A_cav(self):
-        return math.pi * self.d_bar_cav ** 2 / 4 + \
-            math.pi * self.d_bar_cav * self.dep_cav + \
-            math.pi * (self.d_bar_cav ** 2 - self.d_ap ** 2) / 4
+        return np.pi * self.d_bar_cav ** 2 / 4 + \
+            np.pi * self.d_bar_cav * self.dep_cav + \
+            np.pi * (self.d_bar_cav ** 2 - self.d_ap ** 2) / 4
 
     def q_in(self):
         # The accepted energy from the reflector, W
@@ -74,7 +73,7 @@ class DishCollector:
         T = (self.st_i.T + self.st_o.T)/2
         p = (self.st_i.P + self.st_o.P)/2
         density = PropsSI('D', 'T', T, 'P', p, self.st_i.fluid)
-        v = 4 * self.st_i.dot_m[0] / (math.pi * self.airPipe.d_i ** 2 * density)
+        v = 4 * self.st_i.dot_m[0] / (np.pi * self.airPipe.d_i ** 2 * density)
         mu = PropsSI('V', 'T', T, 'P', p, self.st_i.fluid)
         Re = density * v * self.airPipe.d_i / mu
         Cp = PropsSI('C', 'T', T, 'P', p, self.st_i.fluid)
@@ -90,10 +89,10 @@ class DishCollector:
         h = Nu * k / self.airPipe.d_i
 
         H_prime_c = self.airPipe.d_i + 2 * self.airPipe.delta_a
-        N = math.floor(self.dep_cav / H_prime_c)
+        N = np.floor(self.dep_cav / H_prime_c)
         H_c = self.dep_cav / N
-        L_c = N * math.sqrt((math.pi * self.d_cav)**2 + H_c**2)
-        A_airPipe = math.pi * self.airPipe.d_i * L_c
+        L_c = N * np.sqrt((np.pi * self.d_cav)**2 + H_c**2)
+        A_airPipe = np.pi * self.airPipe.d_i * L_c
 
         DeltaT1 = self.airPipe.T - self.st_i.T
         DeltaT2 = self.airPipe.T - self.st_o.T
@@ -103,7 +102,7 @@ class DishCollector:
 
     def q_ref(self):
         # Relected energy by the receiver, W
-        A_ap = math.pi * self.d_ap ** 2 / 4
+        A_ap = np.pi * self.d_ap ** 2 / 4
         alpha_eff = self.airPipe.alpha / \
             (self.airPipe.alpha + (1 - self.airPipe.alpha) *
              (A_ap / self.A_cav))
@@ -136,8 +135,8 @@ class DishCollector:
         # Heat loss from air pipe to the insulating layer, W
         d_o = self.insLayer.d_i + 2 * self.insLayer.delta
         return (self.airPipe.T - self.insLayer.T) / \
-            (math.log(d_o / self.insLayer.d_i) /
-             (2 * math.pi * self.insLayer.lamb * self.dep_cav))
+            (np.log(d_o / self.insLayer.d_i) /
+             (2 * np.pi * self.insLayer.lamb * self.dep_cav))
 
     def q_conv_tot(self):
         # Total covection loss, W
@@ -162,7 +161,7 @@ class DishCollector:
 
     def q_rad_emit(self):
         # Emitted radiation loss, W
-        A_ap = math.pi * self.d_ap ** 2 / 4
+        A_ap = np.pi * self.d_ap ** 2 / 4
         alpha_eff = self.airPipe.alpha / \
             (self.airPipe.alpha + (1 - self.airPipe.alpha) *
              (A_ap / self.A_cav))

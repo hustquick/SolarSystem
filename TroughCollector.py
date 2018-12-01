@@ -5,7 +5,7 @@ from Ambient import Ambient
 from Stream import Stream
 from CoolProp import CoolProp
 import Const
-from math import radians, log, pi
+import numpy as np
 
 
 class TroughCollector:
@@ -22,7 +22,7 @@ class TroughCollector:
         self.Fe = 0.97      # Soiling factor of the trough collector
         self.d_i = 0.066    # Inner diameter of the absorber, m
         self.d_o = 0.07     # Outer diameter of the absorber, m
-        self.phi = radians(70)  # Incidence angle, rad
+        self.phi = np.deg2rad(70)  # Incidence angle, rad
         self.f = 0          # Focal length, m
         self.len = 0        # Length of the collector, m
         self.tc_type = None  # type of the collector
@@ -63,7 +63,7 @@ class TroughCollector:
         # Required length of unit mass flow rate of the collector to
         # heat the temperature of the working fluid from
         # st_i.T upto st_o.T
-        para = pi * self.d_o
+        para = np.pi * self.d_o
         eta_opt_0 = self.rho * self.gamma * self.tau * self.alpha
         q = self.amb.I * self.w * eta_opt_0 * self.K * self.Fe / para
         T = (self.st_i.T + self.st_o.T) / 2
@@ -72,7 +72,7 @@ class TroughCollector:
         U = self.U
         DeltaT_o = self.st_o.T - (self.amb.T + q / U)
         DeltaT_i = self.st_i.T - (self.amb.T + q / U)
-        return - cp * log(DeltaT_o / DeltaT_i) / (U * para)
+        return - cp * np.log(DeltaT_o / DeltaT_i) / (U * para)
 
     @property
     def calculate(self):
@@ -112,7 +112,7 @@ class TroughCollector:
         P = (self.st_i.P + self.st_o.P) / 2
         density = CoolProp.PropsSI('D', 'T', T, 'P', P, fluid)
         q_m_basic = self.q_use / (self.st_o.h - self.st_i.h)
-        return 4 * q_m_basic / (density * pi * self.d_i ** 2)
+        return 4 * q_m_basic / (density * np.pi * self.d_i ** 2)
 
 
 if __name__ == '__main__':

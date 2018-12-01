@@ -2,7 +2,7 @@
 functions.
 DO NOT INITIALIZE IT!
 """
-import math
+import numpy as np
 
 
 SIGMA = 5.67e-8
@@ -23,9 +23,9 @@ FLUID = {1: 'Water', 2: 'Air', 3: 'INCOMP::TVP1',
 
 def logMean(a, b):
     if a * b > 0:
-        return (a - b) / math.log(a / b)
+        return (a - b) / np.log(a / b)
     elif a * b < 0:
-        return - (a + b) / math.log(- a / b)
+        return - (a + b) / np.log(- a / b)
     else:
         print("The two numbers are wrong!")
         return []
@@ -49,7 +49,7 @@ def Nu_nat_conv(Gr, T_cav, T_amb, theta, d_ap, d_bar_cav):
     # This function describes the correlation of Nusselt number of the cavity
     S = - 0.982 * (d_ap / d_bar_cav) + 1.12
     return 0.088 * Gr ** (1/3) * (T_cav / T_amb) ** 0.18 \
-        * (math.cos(theta)) ** 2.47 * (d_ap / d_bar_cav) ** S
+        * (np.cos(theta)) ** 2.47 * (d_ap / d_bar_cav) ** S
 
 
 def NuInPipe(Re, Pr, mu, mu_cav):
