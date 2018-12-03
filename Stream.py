@@ -20,7 +20,6 @@ class Stream:
         """
         self.P_dependent = P_dependent  # This is a flag to identify whether it is P-dependent or T-dependent
 
-
     @property
     def T(self):
         return self._T
@@ -32,7 +31,7 @@ class Stream:
         if self.P_dependent:
             if (self._P is None) and (self._x is not None):
                 self._P = PropsSI('P', 'Q', self._x, 'T', float(T), self.fluid)
-            if (self._P is not None) and (self._x is not None):
+            elif (self._P is not None) and (self._x is not None):
                 raise ValueError("The stream is set to be P-dependent.\n"
                                  "Pressure and quality are already set, "
                                  "please check!")
@@ -47,19 +46,23 @@ class Stream:
 
     @T_c.setter
     def T_c(self, T_c):
+        """You may choose to make the judgement by T setter and
+        comment the lines below, and uncomment the last line
+        """
         if T_c < -273.15:
             raise ValueError("Temperature should be higher than -273.15°C")
         if self.P_dependent:
             if (self._P is None) and (self._x is not None):
                 self._P = PropsSI('P', 'Q', self._x, 'T', float(T_c)+273.15, self.fluid)
-            if (self._P is not None) and (self._x is not None):
+            elif (self._P is not None) and (self._x is not None):
                 raise ValueError("The stream is set to be P-dependent.\n"
                                  "Pressure and quality are already set, "
                                  "please check!")
         else:
             if self._x is not None:
                 self._P = PropsSI('P', 'Q', self._x, 'T', float(T_c)+273.15, self.fluid)
-        self._T = float(T_c) + 273.15
+        self._T = float(T_C) + 273.15
+        # self.T = float(T_c) + 273.15
 
     @property
     def P(self):
@@ -75,7 +78,7 @@ class Stream:
         else:
             if (self._T is None) and (self._x is not None):
                 self._T = PropsSI('T', 'Q', self._x, 'P', float(P), self.fluid)
-            if (self._T is not None) and (self._x is not None):
+            elif (self._T is not None) and (self._x is not None):
                 raise ValueError("The stream is set to be T-dependent.\n"
                                  "Temperature and quality are already set, "
                                  "please check!")
@@ -94,12 +97,12 @@ class Stream:
             if self.P_dependent:
                 if self._P is not None:
                     self._T = PropsSI('T', 'Q', self._x, 'P', self._P, self.fluid)
-                if (self._P is None) and (self._T is not None):
+                elif (self._P is None) and (self._T is not None):
                     self._P = PropsSI('P', 'Q', self.x, 'T', self.T, self.fluid)
             else:
                 if self._T is not None:
                     self._P = PropsSI('P', 'Q', self.x, 'T', self.T, self.fluid)
-                if (self._T is None) and (self._P is not None):
+                elif (self._T is None) and (self._P is not None):
                     self._T = PropsSI('T', 'Q', self._x, 'P', self._P, self.fluid)
         else:
             raise ValueError("Wrong x value!\nx should be a number between 0 and 1.")
@@ -118,9 +121,9 @@ class Stream:
     def cp(self):
         return PropsSI('C', 'T', self._T, 'P', self.P, self.fluid) if (self.x is None) else float("inf")
 
-    def flow_to(self, st):
-        st.fluid = self.fluid
-        st.dot_m = self.dot_m
+    def flow_to(self, stream):
+        stream.fluid = self.fluid
+        stream.dot_m = self.dot_m
 
     def mix(self, st1):
         st2 = Stream()
@@ -141,9 +144,8 @@ if __name__ == '__main__':
     st.dot_m = [2]
     st.P_dependent = False
     st.P = 1e5
-    # st.T_c = 200
+    st.T_c = 200
     st.x = 0.1
-    st.T = 400
     # st.x = None
     print(st.T)
     print(st.P)
