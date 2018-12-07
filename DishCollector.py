@@ -80,7 +80,7 @@ class DishCollector:
         k = PropsSI('L', 'T', T, 'P', p, self.st_i.fluid)
         Pr = Cp * mu / k
         mu_cav = PropsSI('V', 'T', self.airPipe.T, 'P', p, self.st_i.fluid)
-        Nu_prime = Const.NuInPipe(Re, Pr, mu, mu_cav)
+        Nu_prime = Const.Nu_in_pipe(Re, Pr, mu, mu_cav)
 
         c_r = 1 + 3.5 * self.airPipe.d_i / (self.d_cav - self.airPipe.d_i
                                             - 2 * self.airPipe.delta_a)
@@ -96,7 +96,7 @@ class DishCollector:
 
         DeltaT1 = self.airPipe.T - self.st_i.T
         DeltaT2 = self.airPipe.T - self.st_o.T
-        DeltaT = Const.logMean(DeltaT1, DeltaT2)
+        DeltaT = Const.log_mean(DeltaT1, DeltaT2)
 
         return h * A_airPipe * DeltaT
 
@@ -121,7 +121,7 @@ class DishCollector:
         k = PropsSI('L', 'T', self.amb.T, 'P', self.amb.P, self.amb.fluid)
         Pr = Cp * mu / k
 
-        Nu = Const.NuOfExternalCylinder(Re, Pr)
+        Nu = Const.Nu_of_external_cylinder(Re, Pr)
 
         h = Nu * k / d_o
         A_ins = self.A_ins
@@ -272,13 +272,13 @@ if __name__ == '__main__':
     dc = DishCollector()
     st_i = Stream()
     st_i.fluid = Const.FLUID[2]
-    st_i.T = Const.convtemp(150, 'C', 'K')
+    st_i.T = Const.convert_temperature(150, 'C', 'K')
     st_i.P = 4e5
     # st_i.dot_m[0] = 0.07
     dc.st_i = st_i
     st_o = Stream()
     st_o.fluid = Const.FLUID[2]
-    st_o.T = Const.convtemp(239.26, 'C', 'K')
+    st_o.T = Const.convert_temperature(239.26, 'C', 'K')
     st_o.P = 4e5
     dc.st_o = st_o
     dc.amb.I = 700
