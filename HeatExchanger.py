@@ -31,7 +31,7 @@ class HeatExchanger:
         h_l = PropsSI('H', 'P', st1_i.pressure, 'Q', 0, st1_i.fluid)
         h_g = PropsSI('H', 'P', st1_i.pressure, 'Q', 1, st1_i.fluid)
         if h_l <= h <= h_g:
-            st1_i.dryness = PropsSI('Q', 'P', st1_i.pressure, 'H', h,
+            st1_i.quality = PropsSI('Q', 'P', st1_i.pressure, 'H', h,
                                     st1_i.fluid)
         else:
             st1_i.temperature = PropsSI('T', 'P', st1_i.pressure, 'H', h,
@@ -48,7 +48,7 @@ class HeatExchanger:
         h_l = PropsSI('H', 'P', st1_o.pressure, 'Q', 0, st1_o.fluid)
         h_g = PropsSI('H', 'P', st1_o.pressure, 'Q', 1, st1_o.fluid)
         if h_l <= h <= h_g:
-            st1_o.dryness = PropsSI('Q', 'P', st1_o.pressure, 'H', h,
+            st1_o.quality = PropsSI('Q', 'P', st1_o.pressure, 'H', h,
                                     st1_o.fluid)
         else:
             st1_o.T = PropsSI('T', 'P', st1_o.pressure, 'H', h,

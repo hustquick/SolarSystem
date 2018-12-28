@@ -19,7 +19,7 @@ class DishCollector:
     d_cav = 0.45       # Diameter of the cavity of the dish receiver, m
     dep_cav = 0.38     # Depth of the cavity of the dish receiver, m
     theta = np.deg2rad(45)   # Dish aperture angle(0 is horizontal,
-    # 90 is vertically down), rad
+    # pi/2 is vertically down), rad
     A = 23.28         # Aperture area of the collector, m^2
 
     def __init__(self):
@@ -140,7 +140,8 @@ class DishCollector:
 
     def q_conv_tot(self):
         # Total convection loss, W
-        average_temperature = (self.airPipe.temperature + self.amb.temperature) / 2   # Film temperature is used
+        average_temperature = (self.airPipe.temperature + self.amb.temperature) / 2
+        # Film temperature is used
         k = PropsSI('L', 'T', average_temperature, 'P', self.amb.pressure, self.amb.fluid)
 
         beta = PropsSI('ISOBARIC_EXPANSION_COEFFICIENT',

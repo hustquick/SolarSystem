@@ -67,7 +67,7 @@ class Turbine:
         h2_l = PropsSI('H', 'P', st2.pressure, 'Q', 0, st2.fluid)
         h2_g = PropsSI('H', 'P', st2.pressure, 'Q', 1, st2.fluid)
         if h2_l <= h2 <= h2_g:
-            st2.dryness = PropsSI('Q', 'P', st2.pressure, 'H', h2, st2.fluid)
+            st2.quality = PropsSI('Q', 'P', st2.pressure, 'H', h2, st2.fluid)
         else:
             st2.temperature = PropsSI('T', 'P', st2.pressure, 'H', h2, st2.fluid)
         return st2

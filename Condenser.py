@@ -7,4 +7,4 @@ from Stream import Stream
 class Condenser:
     st_i = Stream()
     st_o = Stream()
-    st_o.dryness = 0
+    st_o.quality = 0

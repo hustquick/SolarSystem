@@ -45,9 +45,10 @@ def convert_temperature(values_to_convert: float, input_temp_unit: str, output_t
     unit_bias = {'K': 0, 'F': - 273.15 * 9 / 5 + 32, 'C': - 273.15, 'R': 0}
 
     if (input_temp_unit in unit) and (output_temp_unit in unit):
-        return (values_to_convert - unit_bias[input_temp_unit]) * \
+        result = (values_to_convert - unit_bias[input_temp_unit]) * \
                 unit_slope[input_temp_unit] / unit_slope[output_temp_unit] \
                 + unit_bias[output_temp_unit]
+        return result
     else:
         raise ValueError("The units must be 'K', 'C',"
                          " 'F' or 'R'. Please check!")
@@ -66,8 +67,9 @@ def Nu_nat_conv(Gr, T_cav, T_amb, theta, d_ap, d_bar_cav):
     :return: Nu - Nusselt number
     """
     S = - 0.982 * (d_ap / d_bar_cav) + 1.12
-    return 0.088 * Gr ** (1/3) * (T_cav / T_amb) ** 0.18 \
+    result = 0.088 * Gr ** (1/3) * (T_cav / T_amb) ** 0.18 \
         * (np.cos(theta)) ** 2.47 * (d_ap / d_bar_cav) ** S
+    return result
 
 
 def Nu_in_pipe(Re, Pr, mu, mu_cav):
@@ -81,7 +83,8 @@ def Nu_in_pipe(Re, Pr, mu, mu_cav):
     :param mu_cav: dynamic viscosity in the cavity, N.s/(m^2)
     :return: Nu - Nusselt number
     """
-    return 0.027 * Re ** 0.8 * Pr ** (1 / 3) * (mu / mu_cav) ** 0.14
+    result = 0.027 * Re ** 0.8 * Pr ** (1 / 3) * (mu / mu_cav) ** 0.14
+    return result
 
 
 def Nu_of_external_cylinder(Re, Pr):
@@ -94,16 +97,14 @@ def Nu_of_external_cylinder(Re, Pr):
      :param Pr: Prandtl number
      :return: Nu - Nusselt number
      """
-    return 0.3 + 0.62 * Re ** (1/2) * Pr ** (1/3) / (1 + (0.4 / Pr) ** (2/3))\
+    result = 0.3 + 0.62 * Re ** (1/2) * Pr ** (1/3) / (1 + (0.4 / Pr) ** (2/3))\
         ** (1/4) * (1 + (Re / 282000) ** (5/8)) ** (4/5)
+    return result
 
 
 def Nu_of_external_cylinder2(Re, Pr_1, Pr_2):
     if (0.7 < Pr_1 < 500) and (1 < Re < 10 ** 6):
-        if Pr_1 > 10:
-            n = 0.36
-        else:
-            n = 0.37
+        n = 0.36 if Pr_1 > 10 else 0.37
         if Re < 40:
             C = 0.75
             m = 0.4
@@ -117,5 +118,6 @@ def Nu_of_external_cylinder2(Re, Pr_1, Pr_2):
             C = 0.076
             m = 0.7
     else:
-        raise ValueError('Unproper Re number or Pr number')
-    return C * Re ** m * Pr_1 ** n * (Pr_1/Pr_2) ** 0.25
+        raise ValueError('Unproper Reynold number or Prandtl number')
+    result = C * Re ** m * Pr_1 ** n * (Pr_1/Pr_2) ** 0.25
+    return result
