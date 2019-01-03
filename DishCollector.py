@@ -61,7 +61,7 @@ class DishCollector:
         return self.amb.irradiance * self.A * self.gamma * self.shading * self.rho
 
     def q_dr_1_1(self):
-        # The accepted energy from the reflector, W
+        # The absorbed heat of the air, W
         h_o = PropsSI('H', 'T', self.st_o.temperature,
                       'P', self.st_o.pressure, self.st_o.fluid)
         h_i = PropsSI('H', 'T', self.st_i.temperature,
@@ -128,6 +128,7 @@ class DishCollector:
         return h * A_ins * (self.insLayer.temperature - self.amb.temperature)
 
     def q_cond_rad(self):
+        # Radiated energy from the insulating layer, W
         return self.insLayer.epsilon * self.A_ins * \
                 Const.SIGMA * (self.insLayer.temperature ** 4 - self.amb.temperature ** 4)
 
@@ -258,6 +259,7 @@ class DishCollector:
                         - self.q_in()])
 
     def get_A(self):
+        # Known inlet and outlet fluids to calculate the aperture area
         self.st_o.fluid = self.st_i.fluid
         self.st_o.flow_rate = self.st_i.flow_rate
         # Assume no pressure loss
@@ -275,12 +277,12 @@ if __name__ == '__main__':
     st_i.fluid = Const.FLUID[2]
     st_i.temperature = Const.convert_temperature(150, 'C', 'K')
     st_i.pressure = 4e5
-    # st_i.flow_rate[0] = 0.07
+    st_i.flow_rate[0] = 0.07
     dc.st_i = st_i
     st_o = Stream()
     st_o.fluid = Const.FLUID[2]
-    st_o.temperature = Const.convert_temperature(239.26, 'C', 'K')
+    # st_o.temperature = Const.convert_temperature(239.26, 'C', 'K')
     st_o.pressure = 4e5
     dc.st_o = st_o
     dc.amb.irradiance = 700
-    dc.get_dot_m()
+    dc.get_T_o()

@@ -1,8 +1,9 @@
 """This class describes a fluid stream that has inherent
     properties and dependent properties
-    For a stream, properties of fluid, temperature, pressure, x can be set. Properties of h, s, cp
+    For a stream, properties of fluid, temperature, pressure, quality can be set. Properties of h, s, u, cp
     are dependent and can not be set.
-    temperature, pressure, quality are interrelated.
+    Temperature, pressure, quality are interrelated. A flag `pressure_dependent` is set to identify whether the stream
+    is pressure-dependent or temperature-dependent.
     """
 from CoolProp.CoolProp import PropsSI as ps
 import Const
